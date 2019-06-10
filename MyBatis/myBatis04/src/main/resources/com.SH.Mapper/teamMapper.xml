@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<!-- 延迟加载 team部分-->
+<mapper namespace="com.SH.Mapper.IteamMapper">
+    <select id="selectTeam" resultMap="Team_selectRS" parameterType="int">
+    select * from team where team_id=${value}
+</select>
+    <resultMap id="Team_selectRS" type="team" >
+        <id property="team_id" column="team_id"/>
+        <result property="team_name" column="team_name"/>
+        <collection property="vocaloids" ofType="vocaloid" select="com.SH.Mapper.IVocaloidMapper.selectLazyLoadingCard" column="team_id">
+
+        </collection>
+    </resultMap>
+</mapper>

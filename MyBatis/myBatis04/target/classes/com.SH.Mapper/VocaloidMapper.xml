@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SH.Mapper.IVocaloidMapper">
+
+
+<!--   连接查询，将两个表连接起来一块查询，两个表可以无关 ,新建一个bean c，继承一个表A的Bean，然后在c bean的里面再写B的属性，注意重写toString方法
+然后注意c bean的命名规范是 xxBusiness xml里返回值写c类型，但在java代码中用父类（a bean）的类型 -->
+<!--    SELECT 表a别名.*,表b别名.* FROM 表a名 空格+a别名a , 表b名 空格+b别名b WHERE a.`name`=b.name-->
+<!--    <select id="selectOFO"  resultType="link_v_vc" >-->
+<!--        select a.*,b.* from vocaloid a,vocaloid_card b where a.name=b.card_name-->
+<!--    </select>-->
+
+
+
+    <!-- 一对一关联查询，先在数据库将两个表用外键关联约束 ，将两个表的数据一起查出,返回值类型可以和连接查询的一致，但推荐用resultmap，mysql的查询语句如下  -->
+<!--    SELECT
+	a.*,
+	b.*
+FROM
+	vocaloid a
+	INNER JOIN vocaloid_card b ON a.`name` = b.card_name
+WHERE
+	a.id =1-->
+<!--    这里我加了动态sql的样子-->
+    <select id="selectROFO" resultMap="OFO_selectRS" parameterType="hashmap" >
+        select a.*,b.* from vocaloid a inner join vocaloid_card b on a.name=b.card_name
+        <where>
+
+            <if test="id!=null and id!='' ">
+                and a.id=${id}
+            </if>
+
+            <if test="name!=null and name!='' ">    <!-- 是and不是&-->
+                and a.name like '%${name}%'
+            </if>
+        </where>
+    </select>
+    <resultMap id="OFO_selectRS" type="vocaloid" >
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>
+        <result property="color" column="color"/>
+        <association property="card" javaType="vocaloid_card"><!--注意这里是JavaType不是column -->
+            <id property="card_name" column="card_name"/>
+            <result property="favorite" column="favorite"/>
+            <result property="card_no" column="card_no"/>
+        </association>
+    </resultMap>
+
+    <!--  一对多关系查询  -->
+    <select id="selectOFM" parameterType="hashmap" resultMap="OFM_selectRS">
+        select a.*,b.* from team a inner join vocaloid b on a.team_id=b.team_id where a.team_id=${team_id}
+    </select>
+    <resultMap id="OFM_selectRS" type="team" >
+        <id property="team_id" column="team_id"/>
+        <result property="team_name" column="team_name"/>
+        <collection property="vocaloids" ofType="vocaloid" >
+            <id property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>
+            <result property="color" column="color" />
+<!--        第三个表沒查到，明天看看sql怎么写的 (不知道)   -->
+            <association property="card" javaType="vocaloid_card">
+            <id property="card_name" column="card_name"/>
+            <result property="favorite" column="favorite"/>
+            <result property="card_no" column="card_no"/>
+            </association>
+        </collection>
+    </resultMap>
+
+<!-- 延迟加载-->
+    <select id="selectLazyLoadingCard" parameterType="int" resultMap="LLC_selectRS" >
+        select * from vocaloid where id=#{team_id}
+    </select>
+    <resultMap id="LLC_selectRS" type="vocaloid" >
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>
+        <result property="color" column="color"/>
+        <association property="card" javaType="vocaloid_card" select="com.SH.Mapper.Vocaloid_CardMapper.selectCard" column="name">
+
+        </association>
+    </resultMap>
+</mapper>

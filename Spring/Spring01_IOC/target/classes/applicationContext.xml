@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+<!--    default-autowire="byName"  全局设置开启自动装配-->
+
+
+<!--    寻找哪一个包里的注解-->
+<context:component-scan base-package="com.SH.Bean,com.SH.Dao,com.SH.Service" />
+
+
+    <!-- 数据库相关，业务（事务）   -->
+<tx:annotation-driven transaction-manager="transactionManager"/>
+<!--    创建transactionManager的Bean-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+<!-- dataSource的属性-->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="username" value="root"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/database"/>
+        <property name="password" value="123456"/>
+        <property name="maxTotal" value="10"/>
+        <property name="maxIdle" value="6"/>
+     </bean>
+
+<!--service-->
+<bean id="service" class="com.SH.Service.ServiceImpl" >
+    <property name="dao" ref="daoImpl"/>
+</bean>
+    <bean id="daoImpl" class="com.SH.Dao.daoImpl" >
+    </bean>
+
+
+    <bean id="list" class="com.SH.Bean.ListType" >
+        <property name="listStudents">
+            <list>
+                <value>dsad3</value>
+                <value>dsad33</value>
+                <value>dsad3353</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="UsersSet" class="com.SH.Bean.Users"  >
+<!--        autowire="byName"    在bean的属性加上，能自动装配对象类型的属性，但降低了代码可读性-->
+        <property name="username">
+            <value><![CDATA[><><>%^$^%$#D]]> </value>
+        </property>
+        <property name="usermail" value="2011054984@qq.com"/>
+        <property name="userid" value="1"/>
+        <property name="userpassword" value="123456"/>
+        <property name="list" ref="list"/>
+
+    </bean>
+
+    <bean id="UsersContruct" class="com.SH.Bean.Users" >
+        <constructor-arg value="kimet" name="username"/>
+        <constructor-arg value="1849468240@qq.com" name="usermail"/>
+        <constructor-arg value="2" name="userid"/>
+        <constructor-arg value="112233445566" name="userpassword"/>
+    </bean>
+
+    <bean id="UsersP" class="com.SH.Bean.Users" p:userid="3" p:usermail="11@qq,com" p:username="kime" p:userpassword="123"/>
+
+<!--对于集合类型的注入方式-->
+    <bean id="StudentsList" class="com.SH.Bean.ListType" >
+<!--       list集合类型-->
+        <property name="listStudents" >
+            <list>
+                <value>student1</value>
+                <value>hh1</value>
+                <value>dd1</value>
+            </list>
+        </property>
+
+        <property name="arrayStudents">
+            <array >
+                <value>student2</value>
+                <value>23dd</value>
+                <value>2434dsadsad</value>
+            </array>
+        </property>
+
+        <property name="setStudents">
+            <set>
+                <value>student3</value>
+                <value>sdsd33</value>
+                <value>stsdsadasdnt3</value>
+            </set>
+        </property>
+
+        <property name="mapStudents" >
+            <map>
+                <entry>
+                    <key>
+                        <value>
+                            student1
+                        </value>
+                    </key>
+                    <value>st4</value>
+                </entry>
+                <entry>
+                    <key>
+                        <value>
+                            student2
+                        </value>
+                    </key>
+                    <value>sdsdsds</value>
+                </entry>
+                <entry>
+                    <key>
+                        <value>
+                            studen3
+                        </value>
+                    </key>
+                    <value>studendsadsa3</value>
+                </entry>
+            </map>
+        </property>
+        <property name="propertiesStudents">
+            <props>
+                <prop key="5">students1</prop>
+                <prop key="4">students1</prop>
+                <prop key="3">students1</prop>
+                <prop key="2">students3</prop>
+                <prop key="1">students4</prop>
+            </props>
+        </property>
+    </bean>
+</beans>

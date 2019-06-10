@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+<context:component-scan base-package="com.SH.Controller"/>
+
+    <mvc:view-resolvers>
+<!--        直接设置bean也行-->
+        <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+<!--            注意路径的前面要带上/，表示相对路径-->
+            <property name="prefix" value="/WEB-INF/views/"/>
+            <property name="suffix" value=".jsp"/>
+        </bean>
+    </mvc:view-resolvers>
+
+
+<!-- 不通过requestMapping，直接跳转到某个页面，默认请求转发方式，即forward方式-->
+    <mvc:view-controller path="viewC" view-name="OK"/>
+
+<!-- 图片等静态资源的处理，由于springMVC会拦截所有请求，用requestMapping处理，所以静态资源要调用服务器的默认servlet处理   -->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+    <!--    功能强大，负责许多功能的协调,必须添加-->
+<mvc:annotation-driven conversion-service="springConvertors"></mvc:annotation-driven>
+
+
+
+<!-- 配置类型转换器de固定步骤-->
+<!--   01、 先将写好的转换器类放入IOC容器-->
+    <bean id="SToUserConvertor" class="com.SH.Converts.StringToUser"></bean>
+<!--  02、 再将自定义的转换器设置到springMVC中的转换器里 -->
+<!--    <bean id="springConvertors" class="org.springframework.context.support.ConversionServiceFactoryBean">这是转换器的类-->
+<!--    由于数据格式化的类是.format.support.FormattingConversionServiceFactoryBean包括了转换器的类，所以可以用格式化的类同时实现两个功能-->
+    <bean id="springConvertors" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters" >
+            <set>
+                <ref bean="SToUserConvertor"/>
+            </set>
+        </property>
+    </bean>
+<!-- 03、 在<mvc:annotation-driven>里的conversion-service注册 02的bean  -->
+
+
+<!--    数据格式化，配置数据格式化的Bean(见类型转换器)后，在Contoller写个注解就行了。好像只有日期和数字可以格式化分别是@DateTimeFormat（pattern="yyyy-MM-dd"）和@NumberFormat(pattern="###,#")-->
+</beans>

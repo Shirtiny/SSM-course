@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+
+    <bean id="dbproperties" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+<!--        用数组，把多个数据文件引入,用classPath表示位置-->
+        <property name="locations">
+            <array>
+                <value>classpath:db.properties</value>
+            </array>
+        </property>
+    </bean>
+
+<!--配置数据库信息-->
+    <bean id="datasource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+
+<!--配置Mybatis的sqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+<!--        引入数据库信息datasource-->
+        <property name="dataSource" ref="datasource"/>
+<!--     存放mapper.xml映射文件的包/*.xml 这样批量引入xml文件  -->
+        <property name="mapperLocations" value="classpath:MapperXml/*.xml"/>
+    </bean>
+
+<!--批量生成mapper对象,注意两个关键的属性是String类型，用value-->
+    <bean id="mappers" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+<!--引入sqlSessionFactory-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+<!--指定要生成mapper对象的包-->
+        <property name="basePackage" value="com.SH.Mapper"/>
+    </bean>
+
+
+<!--    注入servicey以及其中的（dao层）mapper  Controller那里不用配置，是因为有注解，包括@Controller和@AutoWired或@Quilifier-->
+    <bean id="teacherService" class="com.SH.Service.TeacherServiceImpl">
+        <property name="iTeacherMapper" ref="ITeacherMapper"/>
+    </bean>
+
+
+
+</beans>

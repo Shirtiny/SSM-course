@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="db.properties"/>
+    <typeAliases>
+<!--        <typeAlias type="com.SH.Bean.Vocaloid" alias="vocaloid"/>-->
+        <package name="com.SH.Bean"/>
+<!--   批量命名包里的别名。别名为对应的类名     <package name="com.SH.Bean"/>-->
+    </typeAliases>
+    <typeHandlers>
+        <typeHandler handler="com.SH.TypeHandler.BooleanAndIntHandler" javaType="Boolean" jdbcType="INTEGER"/>
+    </typeHandlers>
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="Mapper/VocaloidMapper.xml"/>
+    </mappers>
+</configuration>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SH.Mapper.IVocaloidMapper">
+    
+    
+<!--    sql片段，使用时，直接用<include refid=" (可选namespace.)id" > 调用-->
+    <sql id="foreach">
+        <foreach collection="array" open="where id in(" close=")" separator="," item="vocaloid">
+            ${vocaloid.id}
+        </foreach>
+    </sql> 
+    
+    
+    
+    
+    
+    
+    
+
+    <select id="selectAll" resultMap="vocaloidRS">
+             select * from vocaloid
+    </select>
+    <resultMap id="vocaloidRS" type="vocaloid" >
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>
+        <result property="color" column="color"/>
+    </resultMap>
+
+
+    <!-- 输入参数用 #{xxx} 的写法,#{xxx}会自动给String类型的xxx加上' ' 如 'xxx'   #｛｝可以防止sql注入-->
+<!-- 模糊查询的sql如select * from vocaloid where id=xx or name like '%xxx%'   注意单引号加百分号-->
+<!--    <select id="selectOne" resultMap="OnevocaloidRS" parameterType="vocaloid">-->
+<!--             select * from vocaloid where id=#{id} or name like #{name}-->
+<!--    </select>-->
+<!--    <resultMap id="OnevocaloidRS" type="vocaloid" >-->
+<!--        <id property="id" column="id"/>-->
+<!--        <result property="name" column="name"/>-->
+<!--        <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>-->
+<!--        <result property="color" column="color"/>-->
+<!--    </resultMap>-->
+
+
+<!--  输入参数用 ${xxx} 的写法 .${xxx}不会给加任何东西，如${xxx} 在sql语句里就是xxx ，不过在简单类型中必须用${value} -->
+<!-- 查询多个  or的两边参数都要有值，优先显示多条的一方 -->
+    <select id="selectMultiple" resultMap="MultipleVocaloidRS" parameterType="vocaloid">
+             select * from vocaloid where id=#{id} or name like '%${name}%'
+
+    </select>
+    <resultMap id="MultipleVocaloidRS" type="vocaloid" >
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>
+        <result property="color" column="color"/>
+    </resultMap>
+
+
+
+
+
+    <!-- 查询表中全部信息，并且根据给定的字段进行排序   -->
+<!--    select * from vocaloid order by ${xxx} desc   默认顺序,asc是顺序desc是逆序-->
+    <select id="selectAllOrder" resultMap="OrderVocaloidRS" parameterType="string">
+             select * from vocaloid order by ${value} asc
+    </select>
+    <resultMap id="OrderVocaloidRS" type="vocaloid" >
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>
+        <result property="color" column="color"/>
+    </resultMap>
+
+
+
+
+    <!--查询表内以下几个字段，并用嵌套类型  输入的为级联属性，vocaloid中的singer.id ....模糊查询name -->
+    <select id="selectAllInner" resultMap="InnerVocaloidRS" parameterType="vocaloid">
+             select id,name,sex,color from vocaloid where id=#{singer.id} or name like '%${singer.name}%'
+    </select>
+    <resultMap id="InnerVocaloidRS" type="vocaloid" >
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>
+        <result property="color" column="color"/>
+    </resultMap>
+
+
+<!--   HashMap的使用 -->
+
+    <!-- 模糊查询多个,使用 输入参数为HashMap 输出结果为resultMap -->
+    <select id="selectMultiple_HashMap" parameterType="HashMap" resultMap="selectMultiple_HashMap" >
+        select * from vocaloid where id=${id} or name like '%${name}%'
+    </select>
+    <resultMap id="selectMultiple_HashMap" type="vocaloid" >
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="sex" column="sex" javaType="Boolean" jdbcType="INTEGER"/>
+        <result property="color" column="color"/>
+    </resultMap>
+<!-- 模糊查询多个，输入参数为HashMap，输出结果也为HashMap (好像只有resultMap要手写类型转换)-->
+    <select id="selectMultiple_AllHashMap" parameterType="hashmap" resultType="hashmap" >
+        select id "id",name "name",sex "sex",color "color" from vocaloid where id=${id} or name like '%${name}%'
+    </select>
+
+
+
+<!--  查询所有v家成员的固定几个字段  （select * 好像不行）-->
+    <select id="selectAll_HashMap" resultType="HashMap" >
+       select id "id" ,name "name",sex "sex",color "color"  from vocaloid
+    </select>
+
+<!--  增加某个成员，使用hashmap输入 好像是可以自动转换了sex的类型的，对象类型也可以 -->
+    <insert id="insertOne_HashMap" parameterType="hashmap">
+        insert into vocaloid values (${id},'${name}',${sex},'${color}')
+    </insert>
+
+<!--   删除一个成员，使用hashmap输入 -->
+    <delete id="deleteOne_HashMap" parameterType="hashmap">
+        delete from vocaloid where id=${id}
+    </delete>
+
+<!-- 修改一个成员，使用hashmap输入  -->
+    <update id="updateOne_HashMap" parameterType="hashmap" >
+        update vocaloid set name='${name}',sex=${sex},color='${color}' where id=${id}
+    </update>
+
+<!--  查询固定字段的成员，输出用 resultType + hashmap 的组合  emmm好像和单独用hashmap的那个没啥区别，接口里注意下返回值类型，不过那个别名可以随意，这个要固定为bean的属性-->
+    <select id="selectAll_RtHp" resultType="vocaloid">
+        select id "id",name "name",sex "sex",color "color" from vocaloid
+    </select>
+
+
+<!--动态SQL查询-->
+    <select id="selectWithSQL" resultType="vocaloid" parameterType="hashmap">
+        select id "id",name "name",sex "sex",color "color" from vocaloid
+<where>
+        <if test="id !=null and id!='' ">
+         and id=${id}
+        </if>
+        <if test="name !=null and name!='' " >
+            and name like '%${name}%'
+        </if>
+        <if test="sex!=null and sex!='' ">
+            and sex=${sex}
+        </if>
+        <if test="color!=null and color!='' ">
+            and color like '%${color}%'
+        </if>
+</where>
+    </select>
+
+<!--  foreach 遍历输入参数的数组 一个bean的属性是数的集合 的情况 -->
+<!--   mySQL:  select * from vocaloid where id in( ids ) -->
+<!--    Oracle: select * from vocaloid and id in ( ids )-->
+<select id="selectForeach" parameterType="singer" resultType="vocaloid" >
+    select * from vocaloid
+    <foreach collection="ids" open=" where id in(" close=")" item="id" separator=","> <!--注意空格 -->
+        ${id}
+    </foreach>
+
+</select>
+
+<!-- 输入参数是普通数组的情况 (这里是整数数组)-->
+ <select id="selectForeachArray" parameterType="int[]" resultType="vocaloid">
+     select * from vocaloid
+     <foreach collection="array" open="where id in (" close=")" separator="," item="id">
+         ${id}
+     </foreach>
+ </select>
+
+
+    <!-- 输入参数是集合的情况-->
+    <select id="selectForeachArrayList" parameterType="list" resultType="vocaloid">
+        select * from vocaloid
+        <foreach collection="list" open="where id in (" close=")" separator="," item="id">
+            ${id}
+        </foreach>
+    </select>
+    
+<!--  输入参数是个对象数组的情况  -->
+    <select id="selectForeachObjectList" parameterType="Object[]" resultType="vocaloid">
+        select * from vocaloid 
+        <include refid="foreach"></include>
+    </select>
+</mapper>

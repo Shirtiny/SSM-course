@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<!-- 延迟加载 card部分-->
+<mapper namespace="com.SH.Mapper.Vocaloid_CardMapper">
+    <select id="selectCard" resultType="vocaloid_card" parameterType="String">
+    select * from vocaloid_card where card_name = #{name}
+</select>
+
+</mapper>

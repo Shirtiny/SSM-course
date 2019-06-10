@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.SH.Bean.personMapper">
+
+    <select id="queryPersonById" resultType="com.SH.Bean.person" parameterType="int">
+
+        select * from person where id = #{id}
+
+    </select>
+
+    <insert id="insertPerson"  parameterType="com.SH.Bean.person">
+
+        insert into person values(#{id},#{name},#{age})
+
+    </insert>
+
+
+    <delete id="deletePerson"  parameterType="int">
+
+        delete from person where id=#{id}
+
+    </delete>
+
+    <update id="updatePerson"  parameterType="com.SH.Bean.person" >
+
+        update person set name=#{name},age=#{age} where id=#{id}
+
+    </update>
+
+
+    <select id="showAll"  resultType="com.SH.Bean.person">
+
+        select * from person
+
+    </select>
+
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.SH.Mapper.IstudentMapper">
+    <select id="SelectOneStudent" resultType="student" parameterType="int">
+        select * from student where sid = #{sid}
+    </select>
+
+    <select id="SelectAllStudent" resultType="student" >
+        select * from student
+    </select>
+
+    <insert id="InsertOneStudent" parameterType="student" >
+        insert into student values(#{sid},#{sname},#{sage},#{shome})
+    </insert>
+
+    <delete id="DeleteOneStudent" parameterType="int" >
+        delete from student where sid=#{sid}
+    </delete>
+
+    <update id="UpdateOneStudent" parameterType="student" >
+        update student set sname=#{sname},sage=#{sage},shome=#{shome} where sid=#{sid}
+    </update>
+
+
+    <!--使用类型转换器后的写法，将java中的Boolean类型传入student表中的Integer类型-->
+
+    <!--查询一个学生，必须使用类型转换器 -->
+    <select id="SelectOneStudentWithTH"  parameterType="int" resultMap="studentRS">
+        select * from student where sid = #{sId}
+    </select>
+    <!-- 当javaType和jdbcType不同或者字段名字不好匹配时，用resultMap。相同时，则使用resultType-->
+    <resultMap  type="student" id="studentRS">
+        <id property="sId" column="sid" /> <!--property是Bean里的属性，column是数据库中的，主键用<id>，其他用<result> -->
+        <result property="sName" column="sName"/><!--注意大小写 -->
+        <result property="sAge" column="sAge"/>
+        <result property="sHome" column="sHome"/>
+        <result property="sexNum" column="sexNum" javaType="Boolean" jdbcType="INTEGER"/>   <!--要进行类型转换的，要表明两个类型 -->
+    </resultMap>
+
+<!-- 删除，使用类型转换器的情况   -->
+    <delete id="DeleteOneStudentWithTH" parameterType="int" >
+        delete from student where sid=#{sId}
+    </delete>
+
+
+<!-- 查询全部学生，必须使用类型转换器，因为要把student中的boolean转为数据库中的int   -->
+    <select id="SelectAllStudentWithTH" resultMap="studentRsList">
+        select * from student
+    </select>
+    <resultMap id="studentRsList" type="student">
+        <id property="sId" column="sid"/>
+        <result property="sName" column="sname"/>
+        <result property="sAge" column="sage"/>
+        <result property="sHome" column="shome"/>
+        <result property="sexNum" column="sexnum" javaType="Boolean" jdbcType="INTEGER"/><!--注意是全大写的Integer -->
+    </resultMap>
+
+    <!--增加一个学生，必须使用类型转换器的情况 -->
+    <insert id="InsertOneStudentWithTH" parameterType="student"><!-- 在要进行转换的值后面，逗号隔开，写上java类型和要专成的数据库类型，不用引号-->
+        insert into student values(#{sId},#{sName},#{sAge},#{sHome},#{sexNum,javaType=Boolean,jdbcType=INTEGER })
+    </insert>
+
+    <!--修改一个学生，必须使用类型转换器的情况 -->
+    <update id="UpdateOneStudentWithTH" parameterType="student" >
+        update student set sname=#{sName},sage=#{sAge},shome=#{sHome},sexnum=#{sexNum,javaType=Boolean,jdbcType=INTEGER} where sid=#{sId}
+    </update>
+</mapper>

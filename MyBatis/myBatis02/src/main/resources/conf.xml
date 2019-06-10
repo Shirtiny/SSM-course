@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="DB.properties"/><!-- 引入DB.properties对数据库链接属性进行设置-->
+    <typeAliases>
+        <typeAlias type="com.SH.Bean.student" alias="student"/><!-- 定义某一类型的别名（昵称），别名不区分大小写-->
+        <!--批量的自动定义某一个包下的所有类的别名，每个类的别名都是它自己的类名 -->
+    <!--    <package name="com.SH.Bean"/>   注意：name的值就是，要批量定义别名的，那个包的名-->
+    </typeAliases>
+<typeHandlers>
+    <typeHandler handler="com.SH.TypeHandler.BooleanToInt" javaType="Boolean" jdbcType="INTEGER"/>
+    <!-- 配置自定义的类型转换器-->
+    
+</typeHandlers>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver_SH}"/><!--使用${example}将DB.properties中的属性值取出，注意是美元符号 -->
+                <property name="url" value="${url_SH}"/>
+                <property name="username" value="${username_SH}"/>
+                <property name="password" value="${password_SH}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <mappers>
+        <mapper resource="com.SH.Mapper/studentMapper.xml"/>
+    </mappers>
+</configuration>

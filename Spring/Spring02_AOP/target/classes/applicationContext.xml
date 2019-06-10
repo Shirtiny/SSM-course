@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                              http://www.springframework.org/schema/aop
+                             http://www.springframework.org/schema/aop/spring-aop.xsd
+                             http://www.springframework.org/schema/context
+                             http://www.springframework.org/schema/context/spring-context.xsd
+                            ">
+
+
+
+
+<!--    设置扫描，扫描某个包里的注解-->
+    <context:component-scan base-package="Advice"/>
+<!--   开启注解对AOP的支持 -->
+    <aop:aspectj-autoproxy ></aop:aspectj-autoproxy>
+
+    <!--将service实现类放入IOC容器-->
+    <bean id="service" class="com.SH.Service.serviceImpl"/>
+
+    <!--将前置通知方法放入IOC容器-->
+    <bean id="beforeAdviceM" class="Advice.printLog" />
+
+    <!--将后置通知方法放入IOC容器-->
+    <bean id="afterAdviceM" class="Advice.afterReturn"/>
+
+    <!--将异常通知方法放入IOC容器-->
+    <bean id="thorwingAdvice" class="Advice.afterThrow"/>
+
+    <!--将环绕通知方法放入IOC容器-->
+    <bean id="aroundingAdvice" class="Advice.around"/>
+
+
+
+
+
+    <!--    配置aop，设置切面，切面连到前置通知类-->
+<!--    设置前置通知的方法，切点，切点精确到方法名、类型-->
+<!-- 这个通知没有实现接口,schema形式的通知-->
+        <aop:config>
+        <aop:aspect id="beforeAdvice" ref="beforeAdviceM">
+            <aop:before method="printL" pointcut="execution(public void com.SH.Service.serviceImpl.saveS())"/>
+
+        </aop:aspect>
+    </aop:config>
+
+
+    <!--     也可以将pointcut提出来写   -->
+<!--        <aop:config>-->
+<!--           <aop:aspect id="beforeAdvice2"   ref="advice" >-->
+<!--            <aop:before method="printL" pointcut-ref="point" />-->
+
+<!--               <aop:pointcut id="point" expression="execution(public void com.SH.Service.serviceImpl.saveS())"/>-->
+<!--           </aop:aspect>-->
+<!--        </aop:config>-->
+
+
+    <!--实现接口的前置通知-->
+    <!--这个不知道为什么会出错(是你实现错了接口，是MethodBeforeAdvice)    -->
+<aop:config>
+    <aop:pointcut id="pointCutBefore" expression="execution(public void com.SH.Service.serviceImpl.saveS())"/>
+    <aop:advisor advice-ref="beforeAdviceM" pointcut-ref="pointCutBefore"/>
+</aop:config>
+
+
+<!--    没有实现接口的后置通知(schema形式的通知)-->
+<aop:config>
+    <aop:aspect id="afterAdvice" ref="afterAdviceM" >
+        <aop:after-returning method="afterReturn" pointcut="execution(public void com.SH.Service.serviceImpl.saveS())"/>
+    </aop:aspect>
+</aop:config>
+
+<!--  实现接口的后置通知  -->
+    <aop:config>
+        <aop:pointcut id="pointcutAfter" expression="execution(public void com.SH.Service.serviceImpl.saveS())"/>
+        <aop:advisor advice-ref="afterAdviceM" pointcut-ref="pointcutAfter"/>
+    </aop:config>
+
+
+
+<!--    异常通知,没有用接口的方法(schema形式的通知) -->
+    <aop:config>
+        <aop:aspect id="throwAdvice" ref="thorwingAdvice" >
+            <aop:after-throwing method="afterthrow" pointcut="execution(public void com.SH.Service.serviceImpl.saveS())"/>
+        </aop:aspect>
+    </aop:config>
+
+    <!-- 异常通知,使用了接口中的方法-->
+    <aop:config>
+        <aop:pointcut id="pointcutThorw" expression="execution(public void com.SH.Service.serviceImpl.saveS())"/>
+        <aop:advisor advice-ref="thorwingAdvice" pointcut-ref="pointcutThorw"/>
+    </aop:config>
+
+<!--    环绕通知-->
+    <aop:config>
+        <aop:pointcut id="pointcutAround" expression="execution(public void com.SH.Service.serviceImpl.saveS())"/>
+        <aop:advisor advice-ref="aroundingAdvice" pointcut-ref="pointcutAround"/>
+    </aop:config>
+
+</beans>

@@ -1,0 +1,41 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+
+<!--配置servlet-->
+    <servlet>
+        <servlet-name>dispatchServlet</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+<!--    若没有初始化参数，默认在web-inf里找名字是(<servlet-name>里的值)加-servlet.xml的文件    -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:springMVC.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatchServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+
+<!--配置隐藏域过滤器,为浏览器增加delete和put方式-->
+    <filter>
+        <filter-name>Filter</filter-name>
+<!--        隐藏域http方法过滤器-->
+        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Filter</filter-name>
+<!--        注意过滤器的拦截是/*,拦截所有请求下的所有属性,servlet的拦截是/ -->
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+<welcome-file-list>
+    <welcome-file>Index.jsp</welcome-file>
+</welcome-file-list>
+
+</web-app>
